@@ -1,15 +1,15 @@
 Package: cfeval
-Title: What the Package Does (One Line, Title Case)
+Title: Causal Forest Evaluation and Visualization
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "John",
            family = "Ensley",
            role = c("aut", "cre"),
            email = "jensley@nexant.com")
-Description: What the package does (one paragraph).
-License: MIT + file LICENSE
-Suggests: 
-    testthat
+Description: Provides some functions to facilitate diagnostics
+    and evaluation of causal forest models as implemented in the "grf" R
+    package.
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
