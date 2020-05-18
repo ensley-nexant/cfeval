@@ -15,15 +15,21 @@ coverage](https://codecov.io/gh/ensley-nexant/cfeval/branch/master/graph/badge.s
 status](https://github.com/ensley-nexant/cfeval/workflows/R-CMD-check/badge.svg)](https://github.com/ensley-nexant/cfeval/actions)
 <!-- badges: end -->
 
-The goal of cfeval is to …
+In the course of an analysis, many causal forest models may need to be
+created, evaluated, and compared to one another. The `cfeval` package
+aims to streamline that process by providing utility and plotting
+functions to perform repetitive tasks common to all of these models.
+
+`cfeval` requires the [`grf` package](https://github.com/grf-labs/grf)
+to function, and is heavily dependent on its API.
 
 ## Installation
 
 You can install the released version of cfeval from
-[CRAN](https://CRAN.R-project.org) with:
+[Github](https://github.com/ensley-nexant/cfeval) with:
 
 ``` r
-install.packages("cfeval")
+devtools::install_github('ensley-nexant/cfeval')
 ```
 
 ## Example
@@ -32,29 +38,16 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(cfeval)
-## basic example code
+
+n <- 2000; p <- 10
+
+X <- matrix(rnorm(n * p), n, p)
+W <- rbinom(n, 1, 0.4 + 0.2 * (X[, 1] > 0))
+Y <- pmax(X[, 1], 0) * W + X[, 2] + pmin(X[, 3], 0) + rnorm(n)
+cf <- grf::causal_forest(X, Y, W)
+
+plot_propensities(cf)
+#> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
-
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub\!
+<img src="man/figures/README-example-1.png" width="100%" />
