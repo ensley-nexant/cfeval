@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot a histogram of fitted propensities — plot_propensities • cfeval</title>
+<title>Plot variable importance of a causal forest — plot.varimp • cfeval</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot a histogram of fitted propensities — plot_propensities" />
-<meta property="og:description" content="The causal forest requires the assumption that we cannot deterministically tell the
-treatment status of an individual given its covariates. In other words, none of the
-propensity scores should be near zero or one." />
+<meta property="og:title" content="Plot variable importance of a causal forest — plot.varimp" />
+<meta property="og:description" content="Plot variable importance of a causal forest" />
 
 
 
@@ -110,48 +108,45 @@ propensity scores should be near zero or one." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot a histogram of fitted propensities</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/diagnose_overlap.R'><code>R/diagnose_overlap.R</code></a></small>
-    <div class="hidden name"><code>plot_propensities.Rd</code></div>
+    <h1>Plot variable importance of a causal forest</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/varimp.R'><code>R/varimp.R</code></a></small>
+    <div class="hidden name"><code>plot.varimp.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The causal forest requires the assumption that we cannot deterministically tell the
-treatment status of an individual given its covariates. In other words, none of the
-propensity scores should be near zero or one.</p>
+    <p>Plot variable importance of a causal forest</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_propensities</span>(<span class='no'>results</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for varimp</span>
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>results</th>
-      <td><p>A trained causal forest object from <code><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></code></p></td>
+      <th>x</th>
+      <td><p>A <code><a href='varimp.html'>varimp</a></code> object</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Additional arguments to be passed to <code><a href='https://ggplot2.tidyverse.org/reference/geom_histogram.html'>geom_histogram</a></code></p></td>
+      <td><p>Additional parameters (not used)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot2 plot object</p>
+    <p>A plot</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>grf</span>)
 
- <span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>2000</span>; <span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>
+ <span class='no'>Xdat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='no'>cfex</span>, <span class='kw'>select</span> <span class='kw'>=</span> -<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>W</span>, <span class='no'>Y</span>))
+ <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_contrasts.html'>make_contrasts</a></span>(<span class='no'>Xdat</span>, <span class='st'>'fct'</span>)
+ <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>cfex</span>$<span class='no'>Y</span>, <span class='no'>cfex</span>$<span class='no'>W</span>)
 
- <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span> * <span class='no'>p</span>), <span class='no'>n</span>, <span class='no'>p</span>)
- <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>0.4</span> + <span class='fl'>0.2</span> * (<span class='no'>X</span>[, <span class='fl'>1</span>] <span class='kw'>&gt;</span> <span class='fl'>0</span>))
- <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmax</a></span>(<span class='no'>X</span>[, <span class='fl'>1</span>], <span class='fl'>0</span>) * <span class='no'>W</span> + <span class='no'>X</span>[, <span class='fl'>2</span>] + <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmin</a></span>(<span class='no'>X</span>[, <span class='fl'>3</span>], <span class='fl'>0</span>) + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
- <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>Y</span>, <span class='no'>W</span>)
-
- <span class='fu'>plot_propensities</span>(<span class='no'>cf</span>)
+ <span class='no'>cfe</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cf_eval.html'>cf_eval</a></span>(<span class='no'>cf</span>, <span class='no'>Xdat</span>)
+ <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>cfe</span>$<span class='no'>varimp</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot a histogram of fitted propensities — plot_propensities • cfeval</title>
+<title>An example dataset to use in causal forests — cfex • cfeval</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Plot a histogram of fitted propensities — plot_propensities" />
-<meta property="og:description" content="The causal forest requires the assumption that we cannot deterministically tell the
-treatment status of an individual given its covariates. In other words, none of the
-propensity scores should be near zero or one." />
+<meta property="og:title" content="An example dataset to use in causal forests — cfex" />
+<meta property="og:description" content="An example dataset to use in causal forests" />
 
 
 
@@ -110,49 +108,22 @@ propensity scores should be near zero or one." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot a histogram of fitted propensities</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/diagnose_overlap.R'><code>R/diagnose_overlap.R</code></a></small>
-    <div class="hidden name"><code>plot_propensities.Rd</code></div>
+    <h1>An example dataset to use in causal forests</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>cfex.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The causal forest requires the assumption that we cannot deterministically tell the
-treatment status of an individual given its covariates. In other words, none of the
-propensity scores should be near zero or one.</p>
+    <p>An example dataset to use in causal forests</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_propensities</span>(<span class='no'>results</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='no'>cfex</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>results</th>
-      <td><p>A trained causal forest object from <code><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></code></p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Additional arguments to be passed to <code><a href='https://ggplot2.tidyverse.org/reference/geom_histogram.html'>geom_histogram</a></code></p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A ggplot2 plot object</p>
+    <p>A data frame with 2000 rows and 13 columns</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>grf</span>)
-
- <span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>2000</span>; <span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>
-
- <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span> * <span class='no'>p</span>), <span class='no'>n</span>, <span class='no'>p</span>)
- <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>0.4</span> + <span class='fl'>0.2</span> * (<span class='no'>X</span>[, <span class='fl'>1</span>] <span class='kw'>&gt;</span> <span class='fl'>0</span>))
- <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmax</a></span>(<span class='no'>X</span>[, <span class='fl'>1</span>], <span class='fl'>0</span>) * <span class='no'>W</span> + <span class='no'>X</span>[, <span class='fl'>2</span>] + <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmin</a></span>(<span class='no'>X</span>[, <span class='fl'>3</span>], <span class='fl'>0</span>) + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
- <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>Y</span>, <span class='no'>W</span>)
-
- <span class='fu'>plot_propensities</span>(<span class='no'>cf</span>)
-}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

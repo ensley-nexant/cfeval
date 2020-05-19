@@ -125,7 +125,7 @@ inverse propensity weights.</p>
 
     <pre class="usage"><span class='fu'>plot_covariate_balance_numeric</span>(<span class='no'>dat</span>, <span class='no'>results</span>, <span class='kw'>covars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
-<span class='fu'>plot_covariate_balance_categorical</span>(<span class='no'>dat</span>, <span class='no'>results</span>, <span class='kw'>covars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>plot</span> <span class='kw'>=</span> <span class='no'>F</span>)</pre>
+<span class='fu'>plot_covariate_balance_categorical</span>(<span class='no'>dat</span>, <span class='no'>results</span>, <span class='kw'>covars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,12 +149,6 @@ version) will be plotted.</p></td>
       <th>...</th>
       <td><p>Additional arguments passed to
 <code><a href='https://ggplot2.tidyverse.org/reference/geom_histogram.html'>geom_histogram</a></code></p></td>
-    </tr>
-    <tr>
-      <th>plot</th>
-      <td><p>If <code>TRUE</code>, returns a <code><a href='https://rdrr.io/pkg/cowplot/man/plot_grid.html'>plot_grid</a></code> of
-plots for each covariate. Otherwise, returns a list of ggplot2 plot
-objects.</p></td>
     </tr>
     </table>
 

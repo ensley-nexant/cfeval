@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Gather causal forest outputs into a data frame — tidy_cf • cfeval</title>
+<title>Create a causal forest results object — results • cfeval</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Gather causal forest outputs into a data frame — tidy_cf" />
+<meta property="og:title" content="Create a causal forest results object — results" />
 <meta property="og:description" content="Having the out-of-bag prediction results in a tidy, tabular format makes
 visualization much easier." />
 
@@ -109,9 +109,9 @@ visualization much easier." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Gather causal forest outputs into a data frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>tidy_cf.Rd</code></div>
+    <h1>Create a causal forest results object</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/results.R'><code>R/results.R</code></a></small>
+    <div class="hidden name"><code>results.Rd</code></div>
     </div>
 
     <div class="ref-description">
@@ -119,7 +119,7 @@ visualization much easier." />
 visualization much easier.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tidy_cf</span>(<span class='no'>fit</span>, <span class='kw'>preds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>results</span>(<span class='no'>fit</span>, <span class='kw'>preds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -177,15 +177,11 @@ for a discussion of the bias measure and how it is calculated.</p></div>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
  <span class='fu'><a href='https://rdrr.io/r/base/library.html'>require</a></span>(<span class='no'>grf</span>)
 
- <span class='no'>n</span> <span class='kw'>&lt;-</span> <span class='fl'>2000</span>; <span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>
+ <span class='no'>Xdat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='no'>cfex</span>, <span class='kw'>select</span> <span class='kw'>=</span> -<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='no'>W</span>, <span class='no'>Y</span>))
+ <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='make_contrasts.html'>make_contrasts</a></span>(<span class='no'>Xdat</span>, <span class='st'>'fct'</span>)
+ <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>cfex</span>$<span class='no'>Y</span>, <span class='no'>cfex</span>$<span class='no'>W</span>)
 
- <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span> * <span class='no'>p</span>), <span class='no'>n</span>, <span class='no'>p</span>)
- <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>0.4</span> + <span class='fl'>0.2</span> * (<span class='no'>X</span>[, <span class='fl'>1</span>] <span class='kw'>&gt;</span> <span class='fl'>0</span>))
- <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmax</a></span>(<span class='no'>X</span>[, <span class='fl'>1</span>], <span class='fl'>0</span>) * <span class='no'>W</span> + <span class='no'>X</span>[, <span class='fl'>2</span>] + <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmin</a></span>(<span class='no'>X</span>[, <span class='fl'>3</span>], <span class='fl'>0</span>) + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
- <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>Y</span>, <span class='no'>W</span>)
- <span class='no'>preds</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>cf</span>, <span class='kw'>estimate.variance</span> <span class='kw'>=</span> <span class='no'>T</span>)
-
- <span class='fu'>tidy_cf</span>(<span class='no'>cf</span>, <span class='no'>preds</span>)
+<span class='fu'><a href='cf_eval.html'>cf_eval</a></span>(<span class='no'>cf</span>, <span class='no'>Xdat</span>)$<span class='no'>res</span>
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

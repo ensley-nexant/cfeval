@@ -78,25 +78,39 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install the released version of cfeval from <a href="https://github.com/ensley-nexant/cfeval">Github</a> with:</p>
+<p>You can install the latest version of cfeval from <a href="https://github.com/ensley-nexant/cfeval">Github</a> with</p>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">'ensley-nexant/cfeval'</span>)</pre></div>
+<p>or, if you have located the path to the source tarball, with</p>
+<div class="sourceCode" id="cb2"><pre class="r">install.packages('E:\Path\To\Package\cfeval_x.x.x.tar.gz', repos = NULL, type = 'source')</pre></div>
 </div>
-<div id="example" class="section level2">
+<div id="usage" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example" class="anchor"></a>Example</h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">cfeval</span>)
+<a href="#usage" class="anchor"></a>Usage</h2>
+<p>First create an example dataset and fit a causal forest.</p>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">cfeval</span>)
 
 <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">2000</span>; <span class="no">p</span> <span class="kw">&lt;-</span> <span class="fl">10</span>
 
 <span class="no">X</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span> * <span class="no">p</span>), <span class="no">n</span>, <span class="no">p</span>)
 <span class="no">W</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fl">0.4</span> + <span class="fl">0.2</span> * (<span class="no">X</span>[, <span class="fl">1</span>] <span class="kw">&gt;</span> <span class="fl">0</span>))
 <span class="no">Y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span>(<span class="no">X</span>[, <span class="fl">1</span>], <span class="fl">0</span>) * <span class="no">W</span> + <span class="no">X</span>[, <span class="fl">2</span>] + <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">pmin</a></span>(<span class="no">X</span>[, <span class="fl">3</span>], <span class="fl">0</span>) + <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>)
-<span class="no">cf</span> <span class="kw">&lt;-</span> <span class="kw pkg">grf</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/grf/man/causal_forest.html">causal_forest</a></span>(<span class="no">X</span>, <span class="no">Y</span>, <span class="no">W</span>)
 
-<span class="fu"><a href="reference/plot_propensities.html">plot_propensities</a></span>(<span class="no">cf</span>)
-<span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></pre></div>
-<p><img src="reference/figures/README-example-1.png" width="100%"></p>
+<span class="no">cf</span> <span class="kw">&lt;-</span> <span class="kw pkg">grf</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/grf/man/causal_forest.html">causal_forest</a></span>(<span class="no">X</span>, <span class="no">Y</span>, <span class="no">W</span>)</pre></div>
+<p>Next, create a causal forest evaluation object, passing the trained forest and the original training dataset.</p>
+<div class="sourceCode" id="cb4"><pre class="r"><span class="no">cfe</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/cf_eval.html">cf_eval</a></span>(<span class="no">cf</span>, <span class="no">X</span>)</pre></div>
+<p>The <code>cf_eval</code> object contains three elements:</p>
+<ol>
+<li>
+<code>dat</code>, the original training dataset;</li>
+<li>
+<code>res</code>, summarized results from out-of-bag training predictions;</li>
+<li>
+<code>varimp</code>, all covariates used in the forest along with their relative importances.</li>
+</ol>
+<p>Note that the trained forest <code>cf</code>, which can be several gigabytes in size even for moderately sized problems, is not copied or carried around by <code>cf_eval</code>. This improves performance. For actual work, I recommend compressing the forest and writing it to disk with <code><a href="https://rdrr.io/r/base/readRDS.html">saveRDS()</a></code>, then loading it for evaluation when required.</p>
+<p>One of the many plotting convenience functions offered by <code>cfeval</code> is to view the distribution of estimated conditional average treatment effects.</p>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/plot.html">plot</a></span>(<span class="no">cfe</span>, <span class="kw">kind</span> <span class="kw">=</span> <span class="st">'cate'</span>)</pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
 </div>
 </div>
   </div>
@@ -129,7 +143,6 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
-<li><a href="https://CRAN.R-project.org/package=cfeval"><img src="https://www.r-pkg.org/badges/version/cfeval" alt="CRAN status"></a></li>
 <li><a href="https://codecov.io/gh/ensley-nexant/cfeval?branch=master"><img src="https://codecov.io/gh/ensley-nexant/cfeval/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://github.com/ensley-nexant/cfeval/actions"><img src="https://github.com/ensley-nexant/cfeval/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 </ul>

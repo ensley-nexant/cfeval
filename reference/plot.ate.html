@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Gather causal forest outputs into a data frame — tidy_cf • cfeval</title>
+<title>Plot a causal forest ATE — plot.ate • cfeval</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Gather causal forest outputs into a data frame — tidy_cf" />
-<meta property="og:description" content="Having the out-of-bag prediction results in a tidy, tabular format makes
-visualization much easier." />
+<meta property="og:title" content="Plot a causal forest ATE — plot.ate" />
+<meta property="og:description" content="Plots the average treatment effect estimated by a
+causal_forest model." />
 
 
 
@@ -109,69 +109,48 @@ visualization much easier." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Gather causal forest outputs into a data frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>tidy_cf.Rd</code></div>
+    <h1>Plot a causal forest ATE</h1>
+    <small class="dont-index">Source: <a href='https://github.com/ensley-nexant/cfeval/blob/master/R/ate.R'><code>R/ate.R</code></a></small>
+    <div class="hidden name"><code>plot.ate.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Having the out-of-bag prediction results in a tidy, tabular format makes
-visualization much easier.</p>
+    <p>Plots the average treatment effect estimated by a
+<code><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></code> model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tidy_cf</span>(<span class='no'>fit</span>, <span class='kw'>preds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for ate</span>
+<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>fit</th>
-      <td><p>A trained causal forest object from
-<code><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></code></p></td>
+      <th>x</th>
+      <td><p>An <code><a href='ate.html'>ate</a></code> object</p></td>
     </tr>
     <tr>
-      <th>preds</th>
-      <td><p>Out-of-bag training predictions from <code>fit</code>, If omitted,
-they will be generated, but this will slow down the function significantly.</p></td>
+      <th>level</th>
+      <td><p>The desired confidence level</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments (ignored)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tibble</a></code> containing the following columns:</p><dl>
-<dt><code>W</code></dt><dd><p>The original treatment assignments.</p></dd>
-<dt><code>W.hat</code></dt><dd><p>The estimated treatment propensities:
-\(\hat{W} = E[W | X]\).</p></dd>
-<dt><code>Y</code></dt><dd><p>The original outcome variable.</p></dd>
-<dt><code>Y.hat</code></dt><dd><p>The expected response estimates, marginalized over
-treatment: \(\hat{Y} = E[Y | X]\).</p></dd>
-<dt><code>treatment</code></dt><dd><p>The treatment
-assignments as a factor, "Control" or "Treated". This looks better in plots
-than <code>W</code> does.</p></dd>
-<dt><code>cate</code></dt><dd><p>The conditional average treatment effect (CATE) estimates</p></dd>
-<dt><code>cate.se</code></dt><dd><p>The standard errors of the CATEs.</p></dd>
-<dt><code>debiased.error</code></dt><dd><p>An estimate of the error obtained if the forest had
-an infinite number of trees.</p></dd>
-<dt><code>excess.error</code></dt><dd><p>A jackknife estimate of how unstable the estimates are
-if forests of the same size were repeatedly grown on the same data set.</p></dd>
-<dt><code>IPW</code></dt><dd><p>The inverse propensity weights: \(\frac{1}{\hat{W}}\)
-if \(W = 1\), \(\frac{1}{1 - \hat{W}}\) otherwise.</p></dd>
-<dt><code>bias</code></dt><dd><p>A measure of each observation's contribution to the overall
-bias of the model, relative to a simple difference in means.</p></dd>
-
-</dl>
-
+    <p>A ggplot2 plot object</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>debiased.error</code> and <code>excess.error</code> serve to partition the overall prediction
-error into two parts. <code>debiased.error</code> is "irreducible" error in a sense because it
-cannot be made smaller by increasing the number of trees in the forest. <code>excess.error</code>
-can, however. The <a href='https://rdrr.io/pkg/grf/man/predict.causal_forest.html'>grf authors recommend</a> growing
-enough trees that <code>excess.error</code> becomes negligible.</p>
+    <p>If <code>level = NULL</code>, the default, no confidence bands will be plotted.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='https://grf-labs.github.io/grf/articles/diagnostics.html#assessing-fit'>https://grf-labs.github.io/grf/articles/diagnostics.html#assessing-fit</a>
-for a discussion of the bias measure and how it is calculated.</p></div>
+    <div class='dont-index'><p>Other plotting methods: 
+<code><a href='plot.cf_eval.html'>plot.cf_eval</a>()</code>,
+<code><a href='plot.results.html'>plot.results</a>()</code>,
+<code><a href='plot.tuning_output.html'>plot.tuning_output</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
@@ -182,10 +161,10 @@ for a discussion of the bias measure and how it is calculated.</p></div>
  <span class='no'>X</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span> * <span class='no'>p</span>), <span class='no'>n</span>, <span class='no'>p</span>)
  <span class='no'>W</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Binomial.html'>rbinom</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>0.4</span> + <span class='fl'>0.2</span> * (<span class='no'>X</span>[, <span class='fl'>1</span>] <span class='kw'>&gt;</span> <span class='fl'>0</span>))
  <span class='no'>Y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmax</a></span>(<span class='no'>X</span>[, <span class='fl'>1</span>], <span class='fl'>0</span>) * <span class='no'>W</span> + <span class='no'>X</span>[, <span class='fl'>2</span>] + <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>pmin</a></span>(<span class='no'>X</span>[, <span class='fl'>3</span>], <span class='fl'>0</span>) + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='no'>n</span>)
- <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>Y</span>, <span class='no'>W</span>)
- <span class='no'>preds</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>cf</span>, <span class='kw'>estimate.variance</span> <span class='kw'>=</span> <span class='no'>T</span>)
 
- <span class='fu'>tidy_cf</span>(<span class='no'>cf</span>, <span class='no'>preds</span>)
+ <span class='no'>cf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/grf/man/causal_forest.html'>causal_forest</a></span>(<span class='no'>X</span>, <span class='no'>Y</span>, <span class='no'>W</span>)
+ <span class='no'>a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ate.html'>ate</a></span>(<span class='no'>cf</span>)
+ <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>a</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
