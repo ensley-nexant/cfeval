@@ -1,4 +1,22 @@
-#' Gather causal forest outputs into a data frame
+new_results <- function(res) {
+  structure(
+    res,
+    class = c('results', 'tbl_df', 'tbl', 'data.frame')
+  )
+}
+
+validate_results <- function(x) {
+  if (!tibble::is_tibble(x)) {
+    stop(
+      "Results must be in a tibble.",
+      call. = F
+    )
+  }
+
+  x
+}
+
+#' Create a causal forest results object
 #'
 #' Having the out-of-bag prediction results in a tidy, tabular format makes
 #' visualization much easier.
@@ -42,24 +60,20 @@
 #' \dontrun{
 #'  require(grf)
 #'
-#'  n <- 2000; p <- 10
+#'  Xdat <- subset(cfex, select = -c(W, Y))
+#'  X <- make_contrasts(Xdat, 'fct')
+#'  cf <- causal_forest(X, cfex$Y, cfex$W)
 #'
-#'  X <- matrix(rnorm(n * p), n, p)
-#'  W <- rbinom(n, 1, 0.4 + 0.2 * (X[, 1] > 0))
-#'  Y <- pmax(X[, 1], 0) * W + X[, 2] + pmin(X[, 3], 0) + rnorm(n)
-#'  cf <- causal_forest(X, Y, W)
-#'  preds <- predict(cf, estimate.variance = T)
-#'
-#'  tidy_cf(cf, preds)
+#' cf_eval(cf, Xdat)$res
 #' }
 #'
 #' @seealso \url{https://grf-labs.github.io/grf/articles/diagnostics.html#assessing-fit}
 #' for a discussion of the bias measure and how it is calculated.
-tidy_cf <- function(fit, preds = NULL) {
+results <- function(fit, preds = NULL) {
   predict <- W <- W.hat <- Y.hat <- cate <- Y.hat.0 <- Y.hat.1 <- NULL
   if (is.null(preds)) preds <- stats::predict(fit, estimate.variance = T)
 
-  results <- dplyr::tibble(
+  res <- dplyr::tibble(
     W = fit$W.orig,
     W.hat = fit$W.hat,
     Y = fit$Y.orig,
@@ -77,41 +91,56 @@ tidy_cf <- function(fit, preds = NULL) {
   ) %>%
     dplyr::select(-Y.hat.0, -Y.hat.1)
 
-  results
+  validate_results(new_results(res))
 }
 
 
-get_ci_const <- function(ci) {
-  1 - (1-ci)/2
-}
 
-
-#' One-hot encode categorical covariates
+#' Visualize a causal forest results object
 #'
-#' The \code{\link[grf]{causal_forest}} algorithm requires inputs to be numeric
-#' matrices. This function uses \code{\link[stats]{model.matrix}} to create such
-#' a matrix from a data frame of covariates.
+#' Certain plots only require a \code{\link{results}} object and not the other
+#' components of a \code{\link{cf_eval}} object. These can be created from
+#' \code{results} only.
 #'
-#' No levels are dropped during the one-hot encodeing; a covariate with \eqn{n}
-#' levels will turn into \eqn{n} binary columns.
+#' Possible options for \code{kind} are:
+#' \describe{
+#' \item{\code{cate}}{A density plot of estimated conditional average
+#' treatment effects, i.e. the causal forest predictions. The most
+#' straightforward way to look for treatment effect heterogeneity.}
 #'
-#' No intercept term is returned in the matrix.
+#' \item{\code{bias}}{A histogram of each observation's contribution to the
+#' overall bias of the model, relative to a simple difference in means.}
 #'
-#' @param X A data frame of covariates. May contain both numeric and categorical
-#'   features together.
-#' @param vars A character vector of covariates to one-hot encode.
+#' \item{\code{propensities}}{A histogram of fitted propensities. The causal
+#' forest requires the assumption that we cannot deterministically tell the
+#' treatment status of an individual given its covariates. In other words, none
+#' of the propensity scores should be near zero or one.}
+#' }
 #'
-#' @return A numeric matrix
+#' @param x A \code{\link{results}} object
+#' @param kind The type of plot to create
+#' @param ... Additional arguments passed to subsequent plot functions
+#'
+#' @return A plot
 #' @export
 #'
+#' @family plotting methods
 #' @examples
 #' \dontrun{
+#'  require(grf)
+#'
 #'  Xdat <- subset(cfex, select = -c(W, Y))
-#'  make_contrasts(Xdat, 'fct')
+#'  X <- make_contrasts(Xdat, 'fct')
+#'  cf <- causal_forest(X, cfex$Y, cfex$W)
+#'
+#'  cfe <- cf_eval(cf, Xdat)
+#'  plot(cfe$res, kind = 'bias')
 #' }
-make_contrasts <- function(X, vars) {
-  cntrs <- purrr::map(vars, ~ contrasts(as.factor(X[[.]]), contrasts = F))
-  names(cntrs) <- vars
+plot.results <- function(x, kind, ...) {
+  type <- match.arg(kind, c('cate', 'bias', 'propensities'))
 
-  stats::model.matrix(~ . + 0, data = X, contrasts = cntrs)
+  switch(type,
+         cate = plot_cate(x),
+         bias = plot_bias(x),
+         propensities = plot_propensities(x))
 }

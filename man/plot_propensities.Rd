@@ -4,10 +4,10 @@
 \alias{plot_propensities}
 \title{Plot a histogram of fitted propensities}
 \usage{
-plot_propensities(fit, ...)
+plot_propensities(results, ...)
 }
 \arguments{
-\item{fit}{A trained causal forest object from \code{\link[grf]{causal_forest}}}
+\item{results}{A trained causal forest object from \code{\link[grf]{causal_forest}}}
 
 \item{...}{Additional arguments to be passed to \code{\link[ggplot2]{geom_histogram}}}
 }

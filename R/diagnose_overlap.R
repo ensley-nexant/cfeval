@@ -4,10 +4,9 @@
 #' treatment status of an individual given its covariates. In other words, none of the
 #' propensity scores should be near zero or one.
 #'
-#' @param fit A trained causal forest object from \code{\link[grf]{causal_forest}}
+#' @param results A trained causal forest object from \code{\link[grf]{causal_forest}}
 #' @param ... Additional arguments to be passed to \code{\link[ggplot2]{geom_histogram}}
 #' @return A ggplot2 plot object
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -22,15 +21,15 @@
 #'
 #'  plot_propensities(cf)
 #' }
-plot_propensities <- function(fit, ...) {
+plot_propensities <- function(results, ...) {
   W.hat <- NULL
 
   cap <- stringr::str_wrap('The causal forest requires the assumption that we cannot deterministically tell the
                             treatment status of an individual given its covariates. In other words, none of the
                             propensity scores should be near zero or one.',
                            width = 120)
-  df <- dplyr::tibble(W.hat = fit$W.hat)
-  ggplot2::ggplot(df, ggplot2::aes(W.hat)) +
+
+  ggplot2::ggplot(results, ggplot2::aes(W.hat)) +
     ggplot2::geom_histogram(...) +
     ggplot2::labs(title = 'Estimated propensity scores',
                   x = 'Propensity score (W.hat)',
@@ -70,11 +69,8 @@ plot_covariate_balance_numeric <- function(dat, results, covars = NULL, ...) {
 
 #' @rdname plot_covariate_balance
 #'
-#' @param plot If \code{TRUE}, returns a \code{\link[cowplot]{plot_grid}} of
-#'   plots for each covariate. Otherwise, returns a list of ggplot2 plot
-#'   objects.
 #' @export
-plot_covariate_balance_categorical <- function(dat, results, covars = NULL, plot = F) {
+plot_covariate_balance_categorical <- function(dat, results, covars = NULL) {
   treatment <- IPW <- NULL
 
   plotvar <- function(x, df) {
@@ -96,17 +92,14 @@ plot_covariate_balance_categorical <- function(dat, results, covars = NULL, plot
 
   plots <- lapply(covars, plotvar, df)
 
-  if (!plot) return(plots)
-  else {
-    if (!requireNamespace('cowplot', quietly = T)) {
-      warning('The "cowplot" package must be installed to arrange a grid of
-               multiple plots. Returning the list of plots instead.')
-      return(plots)
-    } else {
-      cowplot::plot_grid(plotlist = plots,
-                         ncol = min(length(covars), 3),
-                         align = 'hv')
-    }
+  if (!requireNamespace('cowplot', quietly = T)) {
+    warning('The "cowplot" package must be installed to arrange a grid of
+             multiple plots. Returning the list of plots instead.')
+    return(plots)
+  } else {
+    cowplot::plot_grid(plotlist = plots,
+                       ncol = min(length(covars), 3),
+                       align = 'hv')
   }
 }
 

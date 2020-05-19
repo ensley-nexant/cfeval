@@ -7,8 +7,6 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/cfeval)](https://CRAN.R-project.org/package=cfeval)
 [![Codecov test
 coverage](https://codecov.io/gh/ensley-nexant/cfeval/branch/master/graph/badge.svg)](https://codecov.io/gh/ensley-nexant/cfeval?branch=master)
 [![R build
@@ -25,16 +23,22 @@ to function, and is heavily dependent on its API.
 
 ## Installation
 
-You can install the released version of cfeval from
-[Github](https://github.com/ensley-nexant/cfeval) with:
+You can install the latest version of cfeval from
+[Github](https://github.com/ensley-nexant/cfeval) with
 
 ``` r
 devtools::install_github('ensley-nexant/cfeval')
 ```
 
-## Example
+or, if you have located the path to the source tarball, with
 
-This is a basic example which shows you how to solve a common problem:
+``` r
+install.packages('E:\Path\To\Package\cfeval_x.x.x.tar.gz', repos = NULL, type = 'source')
+```
+
+## Usage
+
+First create an example dataset and fit a causal forest.
 
 ``` r
 library(cfeval)
@@ -44,10 +48,36 @@ n <- 2000; p <- 10
 X <- matrix(rnorm(n * p), n, p)
 W <- rbinom(n, 1, 0.4 + 0.2 * (X[, 1] > 0))
 Y <- pmax(X[, 1], 0) * W + X[, 2] + pmin(X[, 3], 0) + rnorm(n)
-cf <- grf::causal_forest(X, Y, W)
 
-plot_propensities(cf)
-#> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+cf <- grf::causal_forest(X, Y, W)
 ```
 
-<img src="man/figures/README-example-1.png" width="100%" />
+Next, create a causal forest evaluation object, passing the trained
+forest and the original training dataset.
+
+``` r
+cfe <- cf_eval(cf, X)
+```
+
+The `cf_eval` object contains three elements:
+
+1.  `dat`, the original training dataset;
+2.  `res`, summarized results from out-of-bag training predictions;
+3.  `varimp`, all covariates used in the forest along with their
+    relative importances.
+
+Note that the trained forest `cf`, which can be several gigabytes in
+size even for moderately sized problems, is not copied or carried around
+by `cf_eval`. This improves performance. For actual work, I recommend
+compressing the forest and writing it to disk with `saveRDS()`, then
+loading it for evaluation when required.
+
+One of the many plotting convenience functions offered by `cfeval` is to
+view the distribution of estimated conditional average treatment
+effects.
+
+``` r
+plot(cfe, kind = 'cate')
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />

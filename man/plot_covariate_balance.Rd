@@ -8,7 +8,7 @@
 \usage{
 plot_covariate_balance_numeric(dat, results, covars = NULL, ...)
 
-plot_covariate_balance_categorical(dat, results, covars = NULL, plot = F)
+plot_covariate_balance_categorical(dat, results, covars = NULL)
 }
 \arguments{
 \item{dat}{A data frame of covariates}
@@ -22,10 +22,6 @@ version) will be plotted.}
 
 \item{...}{Additional arguments passed to
 \code{\link[ggplot2]{geom_histogram}}}
-
-\item{plot}{If \code{TRUE}, returns a \code{\link[cowplot]{plot_grid}} of
-plots for each covariate. Otherwise, returns a list of ggplot2 plot
-objects.}
 }
 \value{
 A ggplot2 plot object, or list of plot objects if \code{plot =
